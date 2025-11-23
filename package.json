@@ -1,0 +1,21 @@
+{
+  "name": "github-material-icons-userscript",
+  "version": "1.0.0",
+  "description": "Material Design icons for GitHub file browser (Userscript)",
+  "scripts": {
+    "fetch": "node scripts/fetch-icons.js",
+    "build": "node scripts/build.js",
+    "dev": "node scripts/build.js --watch",
+    "all": "npm run fetch && npm run build",
+    "deploy": "cp dist/github-material-icons.user.js \"$HOME/Library/Containers/com.userscripts.macos.Userscripts-Extension/Data/Documents/scripts/GitHub Material Icons.user.js\""
+  },
+  "keywords": [
+    "github",
+    "material-icons",
+    "userscript"
+  ],
+  "author": "Brian Alexander",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

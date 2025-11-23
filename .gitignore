@@ -1,0 +1,24 @@
+# Cache directory (downloaded icons and configs)
+cache/
+
+# Vendor directory (cloned material-icon-theme repo)
+vendor/
+
+# Node modules (if we ever add dependencies)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
