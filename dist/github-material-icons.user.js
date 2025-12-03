@@ -145,7 +145,8 @@
     "webpack": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBhdGggZmlsbD0iIzAzYTlmNCIgZD0ibTEzLjg0NCA3LjUzNi0xLjI4OC0xLjA3MkEyIDIgMCAwIDAgMTEuMjc2IDZINGEyIDIgMCAwIDAtMiAydjE2YTIgMiAwIDAgMCAyIDJoMjRhMiAyIDAgMCAwIDItMlYxMGEyIDIgMCAwIDAtMi0ySDE1LjEyNGEyIDIgMCAwIDEtMS4yOC0uNDY0Ii8+PHBhdGggZmlsbD0iI2ZhZmFmYSIgZD0ibTMwLjk5MiAxNC4yNjMtNy00YTIgMiAwIDAgMC0xLjk4NCAwbC03IDRBMiAyIDAgMCAwIDE0IDE2djguNjVhMiAyIDAgMCAwIDEuMDI1IDEuNzQ2bDYgMy4zNUEyIDIgMCAwIDAgMjMgMjkuNzNhMiAyIDAgMCAwIDEuOTc1LjAxNmw2LTMuMzVBMiAyIDAgMCAwIDMyIDI0LjY1VjE2YTIgMiAwIDAgMC0xLjAwOC0xLjczNyIvPjxwYXRoIGZpbGw9IiMwMjc3YmQiIGQ9Ik0zMCAyNC42NSAyNCAyOHYtNmw2LTMuMzV6TTIzIDEybC03IDQgNyA0IDctNHptLTcgMTIuNjVMMjIgMjh2LTZsLTYtMy4zNXoiLz48L3N2Zz4=",
     "coverage": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBhdGggZmlsbD0iIzI2YTY5YSIgZD0ibTEzLjg0NCA3LjUzNi0xLjI4OC0xLjA3MkEyIDIgMCAwIDAgMTEuMjc2IDZINGEyIDIgMCAwIDAtMiAydjE2YTIgMiAwIDAgMCAyIDJoMjRhMiAyIDAgMCAwIDItMlYxMGEyIDIgMCAwIDAtMi0ySDE1LjEyNGEyIDIgMCAwIDEtMS4yOC0uNDY0Ii8+PHBhdGggZmlsbD0iI2IyZGZkYiIgZD0ibTIzLjQ0NCAyMy4yNjUtMy4xMS0zLjE1NiAxLjA5NS0xLjExMiAyLjAxNSAyLjAzNSA1LjEyNy01LjIgMS4wOTYgMS4xMk0yNSAxMGwtNyA0djQuNTNBOS44IDkuOCAwIDAgMCAyNSAyOGE5LjggOS44IDAgMCAwIDctOS40N1YxNFoiLz48L3N2Zz4="
   },
-  "defaultFolder": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBhdGggZmlsbD0iIzkwYTRhZSIgZD0ibTEzLjg0NCA3LjUzNi0xLjI4OC0xLjA3MkEyIDIgMCAwIDAgMTEuMjc2IDZINGEyIDIgMCAwIDAtMiAydjE2YTIgMiAwIDAgMCAyIDJoMjRhMiAyIDAgMCAwIDItMlYxMGEyIDIgMCAwIDAtMi0ySDE1LjEyNGEyIDIgMCAwIDEtMS4yOC0uNDY0Ii8+PC9zdmc+Cg=="
+  "defaultFolder": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHBhdGggZmlsbD0iIzkwYTRhZSIgZD0ibTEzLjg0NCA3LjUzNi0xLjI4OC0xLjA3MkEyIDIgMCAwIDAgMTEuMjc2IDZINGEyIDIgMCAwIDAtMiAydjE2YTIgMiAwIDAgMCAyIDJoMjRhMiAyIDAgMCAwIDItMlYxMGEyIDIgMCAwIDAtMi0ySDE1LjEyNGEyIDIgMCAwIDEtMS4yOC0uNDY0Ii8+PC9zdmc+Cg==",
+  "symlink": "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTMuODQzNzYsNy41MzY0NWwtMS4yODc0OS0xLjA3MjlBMiwyLDAsMCwwLDExLjI3NTkxLDZINEEyLDIsMCwwLDAsMiw4VjI0YTIsMiwwLDAsMCwyLDJIMjhhMiwyLDAsMCwwLDItMlYxMGEyLDIsMCwwLDAtMi0ySDE1LjEyNDEyQTIsMiwwLDAsMSwxMy44NDM3Niw3LjUzNjQ1WiIgZmlsbD0iIzkwYTRhZSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMuMjMzLDMuMzQpIiBmaWxsPSIjZWNlZmYxIj48cGF0aCBkPSJtMjAuNzY3IDkuNjZ2NGgtOHY2aDh2NGw4LTd6IiBmaWxsPSIjZWNlZmYxIiAvPjwvZz48L3N2Zz4="
 };
     
     /**
@@ -255,7 +256,8 @@
 
             // Find the link with the file/folder name
             // Look in the visible (non-edit) link
-            let link = targetCell.querySelector('a.Link--primary[href*="/blob/"], a.Link--primary[href*="/tree/"]');
+            // Note: symlinks don't have the Link--primary class, so we don't require it
+            let link = targetCell.querySelector('a[href*="/blob/"], a[href*="/tree/"]');
 
             if (!link) return;
 
@@ -279,13 +281,24 @@
             let svg = container.querySelector('svg[class*="octicon-file"]');
             if (!svg) return;
 
+            // Check if it's a symlink first
+            const isSymlink = svg.classList.contains('octicon-file-symlink-file') ||
+                            svg.classList.contains('octicon-file-symlink-directory');
+
             // Check if it's a folder
             const isFolder = link.getAttribute('href')?.includes('/tree/') ||
                            svg.getAttribute('aria-label')?.toLowerCase().includes('directory') ||
                            svg.getAttribute('aria-label')?.toLowerCase().includes('folder');
 
             // Get the appropriate icon
-            const iconDataUri = isFolder ? getFolderIcon(name) : getFileIcon(name);
+            let iconDataUri;
+            if (isSymlink) {
+                iconDataUri = ICON_MAPPINGS.symlink;
+            } else if (isFolder) {
+                iconDataUri = getFolderIcon(name);
+            } else {
+                iconDataUri = getFileIcon(name);
+            }
             if (!iconDataUri) return;
 
             // Check if Refined GitHub has wrapped this in an edit link
@@ -383,6 +396,10 @@
             return; // Don't add another icon
         }
 
+        // Check if it's a symlink first
+        const isSymlink = svg.classList.contains('octicon-file-symlink-file') ||
+                        svg.classList.contains('octicon-file-symlink-directory');
+
         // Check if it's a folder by looking at the SVG class
         // Treat both closed and open folder icons the same
         const isFolder = svg.classList.contains('octicon-file-directory') ||
@@ -390,7 +407,14 @@
                        svg.classList.contains('octicon-file-directory-open-fill');
 
         // Get the appropriate icon
-        const iconDataUri = isFolder ? getFolderIcon(name) : getFileIcon(name);
+        let iconDataUri;
+        if (isSymlink) {
+            iconDataUri = ICON_MAPPINGS.symlink;
+        } else if (isFolder) {
+            iconDataUri = getFolderIcon(name);
+        } else {
+            iconDataUri = getFileIcon(name);
+        }
         if (!iconDataUri) return;
 
         // Hide the original SVG
