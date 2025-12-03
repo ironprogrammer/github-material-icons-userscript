@@ -107,20 +107,30 @@ function buildIconMappings() {
   // Add default file/folder icons if they exist
   const defaultFileIcon = path.join(ICONS_DIR, 'file.svg');
   const defaultFolderIcon = path.join(ICONS_DIR, 'folder.svg');
-  
+
   if (fs.existsSync(defaultFileIcon)) {
     mappings.defaultFile = svgToDataUri(fs.readFileSync(defaultFileIcon, 'utf8'));
   } else {
     // Use a simple fallback icon (generic document)
     console.log('  ⚠ No default file icon found, will use first matched icon as fallback');
   }
-  
+
   if (fs.existsSync(defaultFolderIcon)) {
     mappings.defaultFolder = svgToDataUri(fs.readFileSync(defaultFolderIcon, 'utf8'));
   } else {
     // Use a simple fallback icon (generic folder)
     console.log('  ⚠ No default folder icon found, will use first matched icon as fallback');
   }
+
+  // Add symlink icon
+  // This icon is from the material-icons-browser-extension's custom icons, not the VS Code theme.
+  // It's embedded directly here because it's not part of the upstream vscode-material-icon-theme
+  // that our fetch script syncs from. The browser extension created this custom icon specifically
+  // for filesystem symlinks (folder-symlink.svg).
+  // Source: https://github.com/material-extensions/material-icons-browser-extension/blob/main/src/custom/folder-symlink.svg
+  const symlinkSvg = '<svg version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path d="M13.84376,7.53645l-1.28749-1.0729A2,2,0,0,0,11.27591,6H4A2,2,0,0,0,2,8V24a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2H15.12412A2,2,0,0,1,13.84376,7.53645Z" fill="#90a4ae"/><g transform="translate(3.233,3.34)" fill="#eceff1"><path d="m20.767 9.66v4h-8v6h8v4l8-7z" fill="#eceff1" /></g></svg>';
+  mappings.symlink = svgToDataUri(symlinkSvg);
+  console.log('  ✓ Added symlink icon (folder-symlink)');
   
   console.log(`\n✓ Built mappings for ${Object.keys(mappings.extensions).length} extensions, ${Object.keys(mappings.filenames).length} filenames, ${Object.keys(mappings.folders).length} folders`);
   
@@ -260,7 +270,8 @@ function generateUserscript(mappings) {
 
             // Find the link with the file/folder name
             // Look in the visible (non-edit) link
-            let link = targetCell.querySelector('a.Link--primary[href*="/blob/"], a.Link--primary[href*="/tree/"]');
+            // Note: symlinks don't have the Link--primary class, so we don't require it
+            let link = targetCell.querySelector('a[href*="/blob/"], a[href*="/tree/"]');
 
             if (!link) return;
 
@@ -284,13 +295,24 @@ function generateUserscript(mappings) {
             let svg = container.querySelector('svg[class*="octicon-file"]');
             if (!svg) return;
 
+            // Check if it's a symlink first
+            const isSymlink = svg.classList.contains('octicon-file-symlink-file') ||
+                            svg.classList.contains('octicon-file-symlink-directory');
+
             // Check if it's a folder
             const isFolder = link.getAttribute('href')?.includes('/tree/') ||
                            svg.getAttribute('aria-label')?.toLowerCase().includes('directory') ||
                            svg.getAttribute('aria-label')?.toLowerCase().includes('folder');
 
             // Get the appropriate icon
-            const iconDataUri = isFolder ? getFolderIcon(name) : getFileIcon(name);
+            let iconDataUri;
+            if (isSymlink) {
+                iconDataUri = ICON_MAPPINGS.symlink;
+            } else if (isFolder) {
+                iconDataUri = getFolderIcon(name);
+            } else {
+                iconDataUri = getFileIcon(name);
+            }
             if (!iconDataUri) return;
 
             // Check if Refined GitHub has wrapped this in an edit link
@@ -388,6 +410,10 @@ function generateUserscript(mappings) {
             return; // Don't add another icon
         }
 
+        // Check if it's a symlink first
+        const isSymlink = svg.classList.contains('octicon-file-symlink-file') ||
+                        svg.classList.contains('octicon-file-symlink-directory');
+
         // Check if it's a folder by looking at the SVG class
         // Treat both closed and open folder icons the same
         const isFolder = svg.classList.contains('octicon-file-directory') ||
@@ -395,7 +421,14 @@ function generateUserscript(mappings) {
                        svg.classList.contains('octicon-file-directory-open-fill');
 
         // Get the appropriate icon
-        const iconDataUri = isFolder ? getFolderIcon(name) : getFileIcon(name);
+        let iconDataUri;
+        if (isSymlink) {
+            iconDataUri = ICON_MAPPINGS.symlink;
+        } else if (isFolder) {
+            iconDataUri = getFolderIcon(name);
+        } else {
+            iconDataUri = getFileIcon(name);
+        }
         if (!iconDataUri) return;
 
         // Hide the original SVG
