@@ -28,6 +28,7 @@ module.exports = {
     
     // Config & Data
     'json',
+    'jsonc',
     'xml',
     'yml',
     'yaml',
@@ -77,7 +78,11 @@ module.exports = {
     // Other languages
     'rb',
     'py',
-    
+
+    // Database
+    'sql',
+    'sqlite',
+
     // Lock files
     'lock',
   ],
@@ -109,7 +114,9 @@ module.exports = {
     '.eslintrc.json',
     '.prettierrc',
     '.prettierrc.js',
+    '.prettierignore',
     '.stylelintrc',
+    '.stylelintignore',
     
     // Gutenberg
     'block.json',
@@ -118,6 +125,7 @@ module.exports = {
     '.gitignore',
     '.gitattributes',
     '.gitmodules',
+    '.git-blame-ignore-revs',
     '.distignore',  // WordPress distribution ignore (uses git icon)
     
     // Editor/IDE
@@ -126,6 +134,7 @@ module.exports = {
     // Node version
     '.nvmrc',
     '.node-version',
+    '.npmrc',
     
     // Docker
     'Dockerfile',

@@ -50,6 +50,7 @@ function buildIconMappings() {
   const manualExtensionMappings = {
     'yml': 'yaml',
     'yaml': 'yaml',
+    'html': 'html',  // Material Icons only maps 'htm', not 'html'
   };
 
   // Add manual mappings to fileIcons
