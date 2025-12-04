@@ -25,10 +25,11 @@ function svgToDataUri(svgContent) {
 
 /**
  * Build icon mappings from cached data
+ * Returns both the icon data (deduplicated) and mappings that reference icon names
  */
 function buildIconMappings() {
   console.log('Building icon mappings...\n');
-  
+
   const priorityList = require('../src/priority-list.js');
   const fileIconsPath = path.join(CACHE_DIR, 'fileIcons.json');
   const folderIconsPath = path.join(CACHE_DIR, 'folderIcons.json');
@@ -56,70 +57,77 @@ function buildIconMappings() {
   // Add manual mappings to fileIcons
   Object.assign(fileIcons.fileNames, manualFilenameMappings);
   Object.assign(fileIcons.fileExtensions, manualExtensionMappings);
-  
+
+  // Deduplicated icon storage: icon name → data URI
+  const icons = {};
+
+  // Mappings that reference icon names instead of full data URIs
   const mappings = {
     extensions: {},
     filenames: {},
     folders: {},
   };
-  
+
+  // Helper to load an icon and store it in the icons map
+  function loadIcon(iconName) {
+    if (!icons[iconName]) {
+      const iconPath = path.join(ICONS_DIR, `${iconName}.svg`);
+      if (fs.existsSync(iconPath)) {
+        const svgContent = fs.readFileSync(iconPath, 'utf8');
+        icons[iconName] = svgToDataUri(svgContent);
+        return true;
+      }
+      return false;
+    }
+    return true; // Already loaded
+  }
+
   // Map extensions
   priorityList.extensions.forEach(ext => {
     if (fileIcons.fileExtensions && fileIcons.fileExtensions[ext]) {
       const iconName = fileIcons.fileExtensions[ext];
-      const iconPath = path.join(ICONS_DIR, `${iconName}.svg`);
-      
-      if (fs.existsSync(iconPath)) {
-        const svgContent = fs.readFileSync(iconPath, 'utf8');
-        mappings.extensions[ext] = svgToDataUri(svgContent);
+
+      if (loadIcon(iconName)) {
+        mappings.extensions[ext] = iconName;
         console.log(`  ✓ .${ext} → ${iconName}`);
       }
     }
   });
-  
+
   // Map specific filenames
   priorityList.filenames.forEach(filename => {
     if (fileIcons.fileNames && fileIcons.fileNames[filename]) {
       const iconName = fileIcons.fileNames[filename];
-      const iconPath = path.join(ICONS_DIR, `${iconName}.svg`);
-      
-      if (fs.existsSync(iconPath)) {
-        const svgContent = fs.readFileSync(iconPath, 'utf8');
-        mappings.filenames[filename] = svgToDataUri(svgContent);
+
+      if (loadIcon(iconName)) {
+        mappings.filenames[filename] = iconName;
         console.log(`  ✓ ${filename} → ${iconName}`);
       }
     }
   });
-  
+
   // Map folders
   priorityList.folders.forEach(folder => {
     if (folderIcons.folderNames && folderIcons.folderNames[folder]) {
       const iconName = folderIcons.folderNames[folder];
-      const iconPath = path.join(ICONS_DIR, `${iconName}.svg`);
-      
-      if (fs.existsSync(iconPath)) {
-        const svgContent = fs.readFileSync(iconPath, 'utf8');
-        mappings.folders[folder] = svgToDataUri(svgContent);
+
+      if (loadIcon(iconName)) {
+        mappings.folders[folder] = iconName;
         console.log(`  ✓ ${folder}/ → ${iconName}`);
       }
     }
   });
-  
-  // Add default file/folder icons if they exist
-  const defaultFileIcon = path.join(ICONS_DIR, 'file.svg');
-  const defaultFolderIcon = path.join(ICONS_DIR, 'folder.svg');
 
-  if (fs.existsSync(defaultFileIcon)) {
-    mappings.defaultFile = svgToDataUri(fs.readFileSync(defaultFileIcon, 'utf8'));
+  // Add default file/folder icons if they exist
+  if (loadIcon('file')) {
+    mappings.defaultFile = 'file';
   } else {
-    // Use a simple fallback icon (generic document)
     console.log('  ⚠ No default file icon found, will use first matched icon as fallback');
   }
 
-  if (fs.existsSync(defaultFolderIcon)) {
-    mappings.defaultFolder = svgToDataUri(fs.readFileSync(defaultFolderIcon, 'utf8'));
+  if (loadIcon('folder')) {
+    mappings.defaultFolder = 'folder';
   } else {
-    // Use a simple fallback icon (generic folder)
     console.log('  ⚠ No default folder icon found, will use first matched icon as fallback');
   }
 
@@ -130,20 +138,21 @@ function buildIconMappings() {
   // for filesystem symlinks (folder-symlink.svg).
   // Source: https://github.com/material-extensions/material-icons-browser-extension/blob/main/src/custom/folder-symlink.svg
   const symlinkSvg = '<svg version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path d="M13.84376,7.53645l-1.28749-1.0729A2,2,0,0,0,11.27591,6H4A2,2,0,0,0,2,8V24a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2H15.12412A2,2,0,0,1,13.84376,7.53645Z" fill="#90a4ae"/><g transform="translate(3.233,3.34)" fill="#eceff1"><path d="m20.767 9.66v4h-8v6h8v4l8-7z" fill="#eceff1" /></g></svg>';
-  mappings.symlink = svgToDataUri(symlinkSvg);
+  icons['folder-symlink'] = svgToDataUri(symlinkSvg);
+  mappings.symlink = 'folder-symlink';
   console.log('  ✓ Added symlink icon (folder-symlink)');
-  
-  console.log(`\n✓ Built mappings for ${Object.keys(mappings.extensions).length} extensions, ${Object.keys(mappings.filenames).length} filenames, ${Object.keys(mappings.folders).length} folders`);
-  
-  return mappings;
+
+  console.log(`\n✓ Built ${Object.keys(icons).length} unique icons and mappings for ${Object.keys(mappings.extensions).length} extensions, ${Object.keys(mappings.filenames).length} filenames, ${Object.keys(mappings.folders).length} folders`);
+
+  return { icons, mappings };
 }
 
 /**
  * Generate the final userscript
  */
-function generateUserscript(mappings) {
+function generateUserscript(icons, mappings) {
   const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
-  
+
   const userscript = `// ==UserScript==
 // @name         GitHub Material Icons
 // @namespace    http://brianalexander.com/
@@ -160,14 +169,24 @@ function generateUserscript(mappings) {
 
 (function() {
     'use strict';
-    
-    // Icon mappings
+
+    // Icon data (deduplicated - each unique icon stored once)
+    const ICONS = ${JSON.stringify(icons, null, 2)};
+
+    // Icon mappings (reference icon names, not full data URIs)
     const ICON_MAPPINGS = ${JSON.stringify(mappings, null, 2)};
-    
+
     /**
-     * Get icon for a file based on filename and extension
+     * Get icon data URI for an icon name
      */
-    function getFileIcon(filename) {
+    function getIconDataUri(iconName) {
+        return iconName ? ICONS[iconName] : null;
+    }
+
+    /**
+     * Get icon name for a file based on filename and extension
+     */
+    function getFileIconName(filename) {
         // Check for exact filename match first
         if (ICON_MAPPINGS.filenames[filename]) {
             return ICON_MAPPINGS.filenames[filename];
@@ -197,14 +216,14 @@ function generateUserscript(mappings) {
             }
         }
 
-        // Return default file icon (or null to keep GitHub's default)
+        // Return default file icon name (or null to keep GitHub's default)
         return ICON_MAPPINGS.defaultFile || null;
     }
-    
+
     /**
-     * Get icon for a folder
+     * Get icon name for a folder
      */
-    function getFolderIcon(foldername) {
+    function getFolderIconName(foldername) {
         // Try exact match first
         if (ICON_MAPPINGS.folders[foldername]) {
             return ICON_MAPPINGS.folders[foldername];
@@ -240,6 +259,42 @@ function generateUserscript(mappings) {
     }
 
     /**
+     * Determine the icon name based on element type and name
+     * Shared logic for both main file browser and tree view
+     */
+    function determineIconName(name, isSymlink, isFolder) {
+        if (isSymlink) {
+            return ICON_MAPPINGS.symlink;
+        } else if (isFolder) {
+            return getFolderIconName(name);
+        } else {
+            return getFileIconName(name);
+        }
+    }
+
+    /**
+     * Hide an SVG icon and insert a replacement image
+     * Returns true if replacement was successful
+     */
+    function replaceIcon(svg, iconDataUri, insertionParent, insertionReference, applyColorFilter = false) {
+        // Hide the original SVG (use visibility so extensions like Refined GitHub can still find it)
+        svg.style.visibility = 'hidden';
+        svg.style.position = 'absolute';
+
+        // Create our icon with the same margin as the original SVG
+        const img = createIconImg(iconDataUri, svg.style.marginRight || '');
+
+        // Copy color filter if needed (for muted items)
+        if (applyColorFilter && svg.style.color) {
+            img.style.filter = 'opacity(0.5)';
+        }
+
+        // Insert the icon at the specified location
+        insertionParent.insertBefore(img, insertionReference);
+        return true;
+    }
+
+    /**
      * Replace icon for a single file/folder item
      */
     function replaceIconForItem(item, stats) {
@@ -249,13 +304,10 @@ function generateUserscript(mappings) {
             // This is the "back up one level" row
             const svg = parentDirLink.querySelector('svg.octicon');
             if (svg && !svg.nextElementSibling?.classList.contains('material-icon-replacement')) {
-                const iconDataUri = ICON_MAPPINGS.defaultFolder;
+                const iconName = ICON_MAPPINGS.defaultFolder;
+                const iconDataUri = getIconDataUri(iconName);
                 if (iconDataUri) {
-                    svg.style.visibility = 'hidden';
-                    svg.style.position = 'absolute';
-
-                    const img = createIconImg(iconDataUri, '4px');
-                    svg.parentNode.insertBefore(img, svg.nextSibling);
+                    replaceIcon(svg, iconDataUri, svg.parentNode, svg.nextSibling);
                     if (stats) stats.replaced++;
                 }
             }
@@ -305,15 +357,11 @@ function generateUserscript(mappings) {
                            svg.getAttribute('aria-label')?.toLowerCase().includes('directory') ||
                            svg.getAttribute('aria-label')?.toLowerCase().includes('folder');
 
-            // Get the appropriate icon
-            let iconDataUri;
-            if (isSymlink) {
-                iconDataUri = ICON_MAPPINGS.symlink;
-            } else if (isFolder) {
-                iconDataUri = getFolderIcon(name);
-            } else {
-                iconDataUri = getFileIcon(name);
-            }
+            // Get the appropriate icon name and data URI
+            const iconName = determineIconName(name, isSymlink, isFolder);
+            if (!iconName) return;
+
+            const iconDataUri = getIconDataUri(iconName);
             if (!iconDataUri) return;
 
             // Check if Refined GitHub has wrapped this in an edit link
@@ -344,13 +392,7 @@ function generateUserscript(mappings) {
                 // Find the file icon SVG (not the pencil)
                 const fileIconSvg = editLink.querySelector('svg[class*="octicon-file"]:not(.octicon-pencil)');
                 if (fileIconSvg) {
-                    // Hide the file icon SVG (use visibility so RGH can still find it)
-                    fileIconSvg.style.visibility = 'hidden';
-                    fileIconSvg.style.position = 'absolute';
-
-                    // Insert our icon at the beginning of the edit link (before everything)
-                    const img = createIconImg(iconDataUri);
-                    editLink.insertBefore(img, editLink.firstChild);
+                    replaceIcon(fileIconSvg, iconDataUri, editLink, editLink.firstChild);
                     if (stats) stats.replaced++;
                 }
             } else {
@@ -361,19 +403,9 @@ function generateUserscript(mappings) {
                     return; // Already replaced
                 }
 
-                // Hide the original SVG (use visibility so RGH can still find it)
-                svg.style.visibility = 'hidden';
-                svg.style.position = 'absolute';
-
-                // Insert our icon after the hidden SVG
-                const img = createIconImg(iconDataUri, svg.style.marginRight || '');
-
-                // Copy color if needed
-                if (svg.style.color) {
-                    img.style.filter = 'opacity(0.5)'; // Match GitHub's muted color
-                }
-
-                svg.parentNode.insertBefore(img, svg.nextSibling);
+                // Replace the icon (with color filter for muted items)
+                const applyColorFilter = !!svg.style.color;
+                replaceIcon(svg, iconDataUri, svg.parentNode, svg.nextSibling, applyColorFilter);
                 if (stats) stats.replaced++;
             }
     }
@@ -421,24 +453,15 @@ function generateUserscript(mappings) {
                        svg.classList.contains('octicon-file-directory-fill') ||
                        svg.classList.contains('octicon-file-directory-open-fill');
 
-        // Get the appropriate icon
-        let iconDataUri;
-        if (isSymlink) {
-            iconDataUri = ICON_MAPPINGS.symlink;
-        } else if (isFolder) {
-            iconDataUri = getFolderIcon(name);
-        } else {
-            iconDataUri = getFileIcon(name);
-        }
+        // Get the appropriate icon name and data URI
+        const iconName = determineIconName(name, isSymlink, isFolder);
+        if (!iconName) return;
+
+        const iconDataUri = getIconDataUri(iconName);
         if (!iconDataUri) return;
 
-        // Hide the original SVG
-        svg.style.visibility = 'hidden';
-        svg.style.position = 'absolute';
-
-        // Insert our icon after the hidden SVG
-        const img = createIconImg(iconDataUri);
-        svgParent.insertBefore(img, svg.nextSibling);
+        // Replace the icon
+        replaceIcon(svg, iconDataUri, svgParent, svg.nextSibling);
         if (stats) stats.replaced++;
     }
 
@@ -647,18 +670,18 @@ function generateUserscript(mappings) {
  */
 function build() {
   console.log('Building GitHub Material Icons userscript...\n');
-  
+
   try {
-    // Build icon mappings
-    const mappings = buildIconMappings();
-    
+    // Build icon mappings (returns both icons and mappings)
+    const { icons, mappings } = buildIconMappings();
+
     // Generate userscript
     console.log('\nGenerating userscript...');
-    const userscript = generateUserscript(mappings);
-    
+    const userscript = generateUserscript(icons, mappings);
+
     // Write to dist
     fs.writeFileSync(OUTPUT_FILE, userscript);
-    
+
     const sizeKB = (Buffer.byteLength(userscript) / 1024).toFixed(2);
     console.log(`\n✓ Userscript built successfully!`);
     console.log(`  File: ${OUTPUT_FILE}`);
